@@ -12,6 +12,7 @@ let socket
 function Chat() {
     const [name, setName] = useState('')
     const [room, setRoom] = useState('')
+    const [users, setUsers] = useState('');
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
 
@@ -29,10 +30,14 @@ function Chat() {
     }, [])
 
     useEffect(() => {
-        socket.on('message', (message) => {
-            setMessages([...messages, message])
+        socket.on('message', message => {
+            setMessages(messages => [...messages, message])
         })
-    }, [messages])
+
+        socket.on("roomData", ({ users }) => {
+            setUsers(users)
+        })
+    }, [])
 
     const sendMessage = (event) => {
         event.preventDefault()
@@ -41,11 +46,9 @@ function Chat() {
         }
     }
 
-    console.log(message, messages)
-
     return (
         <Container className="d-flex flex-column vh-100 m-0" fluid>
-            <InfoBar room={room} />
+            <InfoBar room={room} users={users} />
             <Messages messages={messages} name={name} />
             <Input message={message} setMessage={setMessage} sendMessage={sendMessage} />
         </Container>
